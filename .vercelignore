@@ -1,0 +1,5 @@
+/.vercelignore
+node_modules
+.env.local
+dist
+.DS_Store
