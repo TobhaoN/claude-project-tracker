@@ -102,6 +102,16 @@ CREATE POLICY "Project tags are viewable by everyone"
   ON project_tags FOR SELECT 
   USING (true);
 
+-- Project_Tags: Anyone can add tag links
+CREATE POLICY "Anyone can add project tags" 
+  ON project_tags FOR INSERT 
+  WITH CHECK (true);
+
+-- Project_Tags: Anyone can remove tag links
+CREATE POLICY "Anyone can delete project tags" 
+  ON project_tags FOR DELETE 
+  USING (true);
+
 -- Notes: Everyone can read
 CREATE POLICY "Notes are viewable by everyone" 
   ON notes FOR SELECT 

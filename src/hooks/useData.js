@@ -183,14 +183,30 @@ export function useUpdateProject() {
 
       if (projectError) throw new Error(projectError.message)
 
-      // Update tags
-      await supabase
+      const { data: existingTagRows, error: existingTagsError } = await supabase
         .from('project_tags')
-        .delete()
+        .select('tag_id')
         .eq('project_id', id)
 
-      if (tags && tags.length > 0) {
-        const tagLinks = tags.map(tagId => ({
+      if (existingTagsError) throw new Error(existingTagsError.message)
+
+      const existingTagIds = [...new Set(existingTagRows.map(row => row.tag_id).filter(Boolean))]
+      const nextTagIds = [...new Set((tags || []).filter(Boolean))]
+      const tagIdsToRemove = existingTagIds.filter(tagId => !nextTagIds.includes(tagId))
+      const tagIdsToAdd = nextTagIds.filter(tagId => !existingTagIds.includes(tagId))
+
+      if (tagIdsToRemove.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('project_tags')
+          .delete()
+          .eq('project_id', id)
+          .in('tag_id', tagIdsToRemove)
+
+        if (deleteError) throw new Error(deleteError.message)
+      }
+
+      if (tagIdsToAdd.length > 0) {
+        const tagLinks = tagIdsToAdd.map(tagId => ({
           project_id: id,
           tag_id: tagId,
         }))

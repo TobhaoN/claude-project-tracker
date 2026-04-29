@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react'
 import { useTags } from '../hooks/useData'
 
-export default function ProjectForm({ initialData, onSubmit, isLoading }) {
+export default function ProjectForm({
+  initialData,
+  onSubmit,
+  isLoading,
+  submitLabel,
+  onCancel,
+  cancelLabel = 'Cancel',
+}) {
   const { data: tags = [] } = useTags()
   const [formData, setFormData] = useState({
     title: '',
@@ -50,6 +57,8 @@ export default function ProjectForm({ initialData, onSubmit, isLoading }) {
     }
     onSubmit(formData)
   }
+
+  const buttonLabel = submitLabel || (initialData ? 'Save Changes' : 'Create Project')
 
   return (
     <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-8 max-w-2xl">
@@ -155,13 +164,26 @@ export default function ProjectForm({ initialData, onSubmit, isLoading }) {
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={isLoading}
-          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold disabled:opacity-50 transition-colors"
-        >
-          {isLoading ? 'Saving...' : 'Create Project'}
-        </button>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          {onCancel && (
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={isLoading}
+              className="w-full sm:w-auto px-6 py-3 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 font-semibold disabled:opacity-50 transition-colors"
+            >
+              {cancelLabel}
+            </button>
+          )}
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full sm:w-auto sm:min-w-40 bg-blue-600 text-white py-3 px-6 rounded-lg hover:bg-blue-700 font-semibold disabled:opacity-50 transition-colors"
+          >
+            {isLoading ? 'Saving...' : buttonLabel}
+          </button>
+        </div>
       </div>
     </form>
   )

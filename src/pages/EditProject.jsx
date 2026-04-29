@@ -58,6 +58,7 @@ export default function EditProject() {
         initialData={project}
         onSubmit={handleSubmit}
         isLoading={updateMutation.isPending}
+        onCancel={() => navigate(`/projects/${id}`)}
       />
     </main>
   )
