@@ -24,7 +24,7 @@ export default function ProjectCard({ project }) {
         </span>
       </div>
 
-      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+      <p className="text-gray-600 text-sm line-clamp-2 mb-3 whitespace-pre-wrap">
         {project.description}
       </p>
 

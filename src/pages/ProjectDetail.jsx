@@ -72,7 +72,7 @@ export default function ProjectDetail() {
               </span>
             </div>
 
-            <p className="text-gray-600 text-lg mb-6 leading-relaxed">
+            <p className="text-gray-600 text-lg mb-6 leading-relaxed whitespace-pre-wrap">
               {project.description}
             </p>
 
