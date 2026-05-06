@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import ProjectCard from './ProjectCard'
+import { htmlToPlainText } from './RichText'
 
 export default function ProjectList({ projects = [], tags = [] }) {
   const [searchTerm, setSearchTerm] = useState('')
@@ -15,7 +16,7 @@ export default function ProjectList({ projects = [], tags = [] }) {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(p =>
         p.title.toLowerCase().includes(term) ||
-        p.description.toLowerCase().includes(term) ||
+        htmlToPlainText(p.description).toLowerCase().includes(term) ||
         p.owner?.name.toLowerCase().includes(term)
       )
     }

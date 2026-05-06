@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
 import NotesList from '../components/NotesList'
+import RichText from '../components/RichText'
 import { useProject, useDeleteProject } from '../hooks/useData'
 
 const statusColors = {
@@ -72,9 +73,19 @@ export default function ProjectDetail() {
               </span>
             </div>
 
-            <p className="text-gray-600 text-lg mb-6 leading-relaxed whitespace-pre-wrap">
-              {project.description}
-            </p>
+            <RichText html={project.description} className="text-lg mb-6" />
+
+            {project.github_url && (
+              <a
+                href={project.github_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+              >
+                <span>🐙</span>
+                <span>View on GitHub</span>
+              </a>
+            )}
 
             {/* Tags */}
             {project.tags && project.tags.length > 0 && (

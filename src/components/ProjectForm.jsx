@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import RichTextEditor from './RichTextEditor'
 import { useTags } from '../hooks/useData'
 
 export default function ProjectForm({
@@ -15,6 +16,7 @@ export default function ProjectForm({
     description: '',
     status: 'active',
     tags: [],
+    githubUrl: '',
     ownerName: '',
     ownerEmail: '',
   })
@@ -26,6 +28,7 @@ export default function ProjectForm({
         description: initialData.description || '',
         status: initialData.status || 'active',
         tags: initialData.tags?.map(t => t.id) || [],
+        githubUrl: initialData.github_url || '',
         ownerName: initialData.owner?.name || '',
         ownerEmail: initialData.owner?.email || '',
       })
@@ -40,6 +43,10 @@ export default function ProjectForm({
     }))
   }
 
+  const handleDescriptionChange = (html) => {
+    setFormData(prev => ({ ...prev, description: html }))
+  }
+
   const handleTagToggle = (tagId) => {
     setFormData(prev => ({
       ...prev,
@@ -49,13 +56,29 @@ export default function ProjectForm({
     }))
   }
 
+  const descriptionTextLength = (() => {
+    if (!formData.description) return 0
+    if (typeof window === 'undefined') return formData.description.length
+    const tmp = document.createElement('div')
+    tmp.innerHTML = formData.description
+    return (tmp.textContent || '').trim().length
+  })()
+
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!formData.title.trim() || !formData.description.trim()) {
+    if (!formData.title.trim() || descriptionTextLength === 0) {
       alert('Title and description are required')
       return
     }
-    onSubmit(formData)
+    const trimmedUrl = formData.githubUrl.trim()
+    if (trimmedUrl && !/^https?:\/\//i.test(trimmedUrl)) {
+      alert('GitHub URL must start with http:// or https://')
+      return
+    }
+    onSubmit({
+      ...formData,
+      githubUrl: trimmedUrl,
+    })
   }
 
   const buttonLabel = submitLabel || (initialData ? 'Save Changes' : 'Create Project')
@@ -82,14 +105,27 @@ export default function ProjectForm({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Description *
           </label>
-          <textarea
-            name="description"
+          <RichTextEditor
             value={formData.description}
+            onChange={handleDescriptionChange}
+            placeholder="Describe what you're working on..."
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Use the toolbar to add formatting, lists, or links.
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            GitHub Repository URL
+          </label>
+          <input
+            type="url"
+            name="githubUrl"
+            value={formData.githubUrl}
             onChange={handleChange}
-            placeholder="Describe what you're working on, your goals, and any specific details..."
-            rows="5"
+            placeholder="https://github.com/your-org/your-repo"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            required
           />
         </div>
 

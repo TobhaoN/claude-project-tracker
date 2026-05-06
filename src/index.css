@@ -9,3 +9,52 @@
 body {
   @apply bg-gray-50 text-gray-900;
 }
+
+/* Rich text content styling (used by editor & rendered descriptions) */
+.rich-text {
+  @apply text-gray-700 leading-relaxed;
+}
+.rich-text p {
+  @apply my-2;
+}
+.rich-text p:first-child { @apply mt-0; }
+.rich-text p:last-child { @apply mb-0; }
+.rich-text h1, .rich-text h2 {
+  @apply text-2xl font-bold text-gray-900 mt-4 mb-2;
+}
+.rich-text h3 {
+  @apply text-xl font-semibold text-gray-900 mt-3 mb-2;
+}
+.rich-text strong { @apply font-semibold text-gray-900; }
+.rich-text em { @apply italic; }
+.rich-text a {
+  @apply text-blue-600 underline hover:text-blue-700;
+}
+.rich-text ul {
+  @apply list-disc pl-6 my-2 space-y-1;
+}
+.rich-text ol {
+  @apply list-decimal pl-6 my-2 space-y-1;
+}
+.rich-text blockquote {
+  @apply border-l-4 border-gray-200 pl-4 italic text-gray-600 my-3;
+}
+.rich-text code {
+  @apply bg-gray-100 text-pink-700 px-1 py-0.5 rounded text-sm font-mono;
+}
+.rich-text pre {
+  @apply bg-gray-900 text-gray-100 rounded-lg p-4 my-3 overflow-x-auto;
+}
+.rich-text pre code {
+  @apply bg-transparent text-gray-100 p-0;
+}
+.rich-text hr {
+  @apply border-gray-200 my-4;
+}
+
+/* TipTap placeholder support (currently unused but reserved) */
+.ProseMirror:focus { outline: none; }
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  @apply text-gray-400 float-left h-0 pointer-events-none;
+}

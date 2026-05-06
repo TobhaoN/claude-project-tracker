@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx'
 import { supabase } from './supabaseClient'
+import { htmlToPlainText } from '../components/RichText'
 
 export async function exportProjectsToExcel() {
   // Fetch all projects with full details
@@ -10,6 +11,7 @@ export async function exportProjectsToExcel() {
       title,
       description,
       status,
+      github_url,
       created_at,
       updated_at,
       users (name, email),
@@ -23,8 +25,9 @@ export async function exportProjectsToExcel() {
   // Build the main Projects sheet
   const projectsRows = projects.map((p) => ({
     'Title': p.title,
-    'Description': p.description,
+    'Description': htmlToPlainText(p.description),
     'Status': p.status,
+    'GitHub URL': p.github_url || '',
     'Owner Name': p.users?.name || '',
     'Owner Email': p.users?.email || '',
     'Tags': p.project_tags.map((pt) => pt.tags.name).join(', '),
@@ -51,7 +54,7 @@ export async function exportProjectsToExcel() {
 
   const projectsSheet = XLSX.utils.json_to_sheet(projectsRows)
   projectsSheet['!cols'] = [
-    { wch: 30 }, { wch: 50 }, { wch: 12 }, { wch: 20 },
+    { wch: 30 }, { wch: 50 }, { wch: 12 }, { wch: 35 }, { wch: 20 },
     { wch: 28 }, { wch: 35 }, { wch: 10 }, { wch: 20 }, { wch: 20 },
   ]
   XLSX.utils.book_append_sheet(wb, projectsSheet, 'Projects')

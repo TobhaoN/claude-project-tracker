@@ -12,6 +12,7 @@ export function useProjects(filters = {}) {
           title,
           description,
           status,
+          github_url,
           owner_id,
           created_at,
           updated_at,
@@ -55,6 +56,7 @@ export function useProject(id) {
           title,
           description,
           status,
+          github_url,
           owner_id,
           created_at,
           updated_at,
@@ -113,7 +115,7 @@ export function useCreateProject() {
 
   return useMutation({
     mutationFn: async (projectData) => {
-      const { title, description, status, tags, ownerName, ownerEmail } = projectData
+      const { title, description, status, tags, githubUrl, ownerName, ownerEmail } = projectData
 
       // Get or create user
       let { data: user, error: userError } = await supabase
@@ -141,6 +143,7 @@ export function useCreateProject() {
           title,
           description,
           status,
+          github_url: githubUrl || null,
           owner_id: user.id,
         }])
         .select('id')
@@ -174,11 +177,17 @@ export function useUpdateProject() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, title, description, status, tags }) => {
+    mutationFn: async ({ id, title, description, status, tags, githubUrl }) => {
       // Update project
       const { error: projectError } = await supabase
         .from('projects')
-        .update({ title, description, status, updated_at: new Date().toISOString() })
+        .update({
+          title,
+          description,
+          status,
+          github_url: githubUrl || null,
+          updated_at: new Date().toISOString(),
+        })
         .eq('id', id)
 
       if (projectError) throw new Error(projectError.message)
@@ -218,9 +227,12 @@ export function useUpdateProject() {
         if (tagError) throw new Error(tagError.message)
       }
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
-      queryClient.invalidateQueries({ queryKey: ['project', variables.id] })
+    onSuccess: async (_, variables) => {
+      // Refetch immediately so the next page sees fresh data
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['projects'] }),
+        queryClient.invalidateQueries({ queryKey: ['project', variables.id] }),
+      ])
     },
   })
 }

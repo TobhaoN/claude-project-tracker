@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { htmlToPlainText } from './RichText'
 
 const statusColors = {
   active: 'bg-green-100 text-green-800',
@@ -24,8 +25,8 @@ export default function ProjectCard({ project }) {
         </span>
       </div>
 
-      <p className="text-gray-600 text-sm line-clamp-2 mb-3 whitespace-pre-wrap">
-        {project.description}
+      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
+        {htmlToPlainText(project.description)}
       </p>
 
       <div className="flex flex-wrap gap-2 mb-3">

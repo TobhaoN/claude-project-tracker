@@ -18,6 +18,7 @@ export default function EditProject() {
         description: formData.description,
         status: formData.status,
         tags: formData.tags,
+        githubUrl: formData.githubUrl,
       })
       navigate(`/projects/${id}`)
     } catch (err) {
