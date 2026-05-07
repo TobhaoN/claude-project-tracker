@@ -17,6 +17,8 @@ export default function ProjectForm({
     status: 'active',
     tags: [],
     githubUrl: '',
+    projectUrl: '',
+    projectUrlLabel: 'Live Demo',
     ownerName: '',
     ownerEmail: '',
   })
@@ -29,6 +31,8 @@ export default function ProjectForm({
         status: initialData.status || 'active',
         tags: initialData.tags?.map(t => t.id) || [],
         githubUrl: initialData.github_url || '',
+        projectUrl: initialData.project_url || '',
+        projectUrlLabel: initialData.project_url_label || 'Live Demo',
         ownerName: initialData.owner?.name || '',
         ownerEmail: initialData.owner?.email || '',
       })
@@ -75,9 +79,16 @@ export default function ProjectForm({
       alert('GitHub URL must start with http:// or https://')
       return
     }
+    const trimmedProjectUrl = formData.projectUrl.trim()
+    if (trimmedProjectUrl && !/^https?:\/\//i.test(trimmedProjectUrl)) {
+      alert('Project URL must start with http:// or https://')
+      return
+    }
     onSubmit({
       ...formData,
       githubUrl: trimmedUrl,
+      projectUrl: trimmedProjectUrl,
+      projectUrlLabel: trimmedProjectUrl ? formData.projectUrlLabel.trim() : '',
     })
   }
 
@@ -127,6 +138,40 @@ export default function ProjectForm({
             placeholder="https://github.com/your-org/your-repo"
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Project Link
+          </label>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <select
+              name="projectUrlLabel"
+              value={formData.projectUrlLabel}
+              onChange={handleChange}
+              className="sm:w-40 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option>Live Demo</option>
+              <option>Figma</option>
+              <option>Docs</option>
+              <option>Notion</option>
+              <option>Slides</option>
+              <option>Video</option>
+              <option>Website</option>
+              <option>Other</option>
+            </select>
+            <input
+              type="url"
+              name="projectUrl"
+              value={formData.projectUrl}
+              onChange={handleChange}
+              placeholder="https://example.com"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <p className="mt-1 text-xs text-gray-500">
+            Pick what kind of link this is, then paste the URL.
+          </p>
         </div>
 
         <div>

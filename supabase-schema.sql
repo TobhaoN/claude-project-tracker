@@ -26,6 +26,8 @@ CREATE TABLE projects (
   description TEXT NOT NULL,
   status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'paused', 'completed')),
   github_url TEXT,
+  project_url TEXT,
+  project_url_label TEXT,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );

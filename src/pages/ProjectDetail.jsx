@@ -75,16 +75,31 @@ export default function ProjectDetail() {
 
             <RichText html={project.description} className="text-lg mb-6" />
 
-            {project.github_url && (
-              <a
-                href={project.github_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
-              >
-                <span>🐙</span>
-                <span>View on GitHub</span>
-              </a>
+            {(project.github_url || project.project_url) && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                {project.github_url && (
+                  <a
+                    href={project.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                  >
+                    <span>🐙</span>
+                    <span>View on GitHub</span>
+                  </a>
+                )}
+                {project.project_url && (
+                  <a
+                    href={project.project_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    <span>🔗</span>
+                    <span>{project.project_url_label || 'Project Link'}</span>
+                  </a>
+                )}
+              </div>
             )}
 
             {/* Tags */}

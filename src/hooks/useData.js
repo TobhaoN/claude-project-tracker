@@ -13,6 +13,8 @@ export function useProjects(filters = {}) {
           description,
           status,
           github_url,
+          project_url,
+          project_url_label,
           owner_id,
           created_at,
           updated_at,
@@ -57,6 +59,8 @@ export function useProject(id) {
           description,
           status,
           github_url,
+          project_url,
+          project_url_label,
           owner_id,
           created_at,
           updated_at,
@@ -115,7 +119,7 @@ export function useCreateProject() {
 
   return useMutation({
     mutationFn: async (projectData) => {
-      const { title, description, status, tags, githubUrl, ownerName, ownerEmail } = projectData
+      const { title, description, status, tags, githubUrl, projectUrl, projectUrlLabel, ownerName, ownerEmail } = projectData
 
       // Get or create user
       let { data: user, error: userError } = await supabase
@@ -144,6 +148,8 @@ export function useCreateProject() {
           description,
           status,
           github_url: githubUrl || null,
+          project_url: projectUrl || null,
+          project_url_label: projectUrlLabel || null,
           owner_id: user.id,
         }])
         .select('id')
@@ -177,7 +183,7 @@ export function useUpdateProject() {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async ({ id, title, description, status, tags, githubUrl }) => {
+    mutationFn: async ({ id, title, description, status, tags, githubUrl, projectUrl, projectUrlLabel }) => {
       // Update project
       const { error: projectError } = await supabase
         .from('projects')
@@ -186,6 +192,8 @@ export function useUpdateProject() {
           description,
           status,
           github_url: githubUrl || null,
+          project_url: projectUrl || null,
+          project_url_label: projectUrlLabel || null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', id)
