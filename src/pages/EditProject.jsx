@@ -1,6 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import ProjectForm from '../components/ProjectForm'
+import ProjectImageManager from '../components/ProjectImageManager'
 import { useProject, useUpdateProject } from '../hooks/useData'
 
 export default function EditProject() {
@@ -63,6 +64,8 @@ export default function EditProject() {
         isLoading={updateMutation.isPending}
         onCancel={() => navigate(`/projects/${id}`)}
       />
+
+      <ProjectImageManager projectId={id} />
     </main>
   )
 }

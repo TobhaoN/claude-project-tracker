@@ -297,3 +297,101 @@ export function useAddNote() {
     },
   })
 }
+
+const PROJECT_IMAGES_BUCKET = 'project-images'
+
+export function useProjectImages(projectId) {
+  return useQuery({
+    queryKey: ['projectImages', projectId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('project_images')
+        .select('id, project_id, storage_path, url, caption, sort_order, created_at')
+        .eq('project_id', projectId)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+
+      if (error) throw new Error(error.message)
+      return data
+    },
+    enabled: !!projectId,
+  })
+}
+
+export function useUploadProjectImage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ projectId, file }) => {
+      if (!file) throw new Error('No file selected')
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Only image files are allowed')
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error('Image must be smaller than 10 MB')
+      }
+
+      const ext = (file.name.split('.').pop() || 'png').toLowerCase()
+      const safeExt = /^[a-z0-9]+$/.test(ext) ? ext : 'png'
+      const path = `${projectId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${safeExt}`
+
+      const { error: uploadError } = await supabase
+        .storage
+        .from(PROJECT_IMAGES_BUCKET)
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        })
+
+      if (uploadError) throw new Error(uploadError.message)
+
+      const { data: urlData } = supabase
+        .storage
+        .from(PROJECT_IMAGES_BUCKET)
+        .getPublicUrl(path)
+
+      const { error: insertError } = await supabase
+        .from('project_images')
+        .insert([{
+          project_id: projectId,
+          storage_path: path,
+          url: urlData.publicUrl,
+        }])
+
+      if (insertError) {
+        // best-effort cleanup if DB insert fails
+        await supabase.storage.from(PROJECT_IMAGES_BUCKET).remove([path])
+        throw new Error(insertError.message)
+      }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['projectImages', variables.projectId] })
+    },
+  })
+}
+
+export function useDeleteProjectImage() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ image }) => {
+      const { error: dbError } = await supabase
+        .from('project_images')
+        .delete()
+        .eq('id', image.id)
+
+      if (dbError) throw new Error(dbError.message)
+
+      if (image.storage_path) {
+        await supabase
+          .storage
+          .from(PROJECT_IMAGES_BUCKET)
+          .remove([image.storage_path])
+      }
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['projectImages', variables.image.project_id] })
+    },
+  })
+}

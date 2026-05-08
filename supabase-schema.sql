@@ -139,7 +139,10 @@ INSERT INTO tags (name) VALUES
   ('Mobile'),
   ('Bug Fix'),
   ('Feature'),
-  ('Research')
+  ('Research'),
+  ('Training'),
+  ('Salesforce'),
+  ('Customer Facing')
 ON CONFLICT (name) DO NOTHING;
 
 -- 6. Sample data (optional - remove before going live)

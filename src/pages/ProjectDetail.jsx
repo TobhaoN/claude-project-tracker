@@ -2,6 +2,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
 import NotesList from '../components/NotesList'
 import RichText from '../components/RichText'
+import ProjectImageGallery from '../components/ProjectImageGallery'
 import { useProject, useDeleteProject } from '../hooks/useData'
 
 const statusColors = {
@@ -148,6 +149,9 @@ export default function ProjectDetail() {
           <div className="bg-white rounded-lg shadow p-8">
             <NotesList projectId={id} />
           </div>
+
+          {/* Images */}
+          <ProjectImageGallery projectId={id} />
         </div>
 
         {/* Sidebar - Stats */}
