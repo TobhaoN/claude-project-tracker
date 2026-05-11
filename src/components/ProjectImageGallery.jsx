@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useProjectImages } from '../hooks/useData'
 
-export default function ProjectImageGallery({ projectId }) {
+export default function ProjectImageGallery({ projectId, inline = false }) {
   const { data: images = [], isLoading } = useProjectImages(projectId)
   const [lightboxIndex, setLightboxIndex] = useState(null)
 
@@ -17,8 +17,12 @@ export default function ProjectImageGallery({ projectId }) {
     setLightboxIndex((i) => (i === images.length - 1 ? 0 : i + 1))
   }
 
+  const wrapperClass = inline
+    ? 'border-t pt-6 mt-6'
+    : 'bg-white rounded-lg shadow p-8'
+
   return (
-    <div className="bg-white rounded-lg shadow p-8">
+    <div className={wrapperClass}>
       <h3 className="text-xl font-semibold text-gray-900 mb-4">Images</h3>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         {images.map((img, idx) => (

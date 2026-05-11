@@ -127,6 +127,9 @@ export default function ProjectDetail() {
               )}
             </div>
 
+            {/* Images (inline, above edit/delete) */}
+            <ProjectImageGallery projectId={id} inline />
+
             {/* Edit/Delete Actions */}
             <div className="flex gap-3 mt-6 pt-6 border-t">
               <Link
@@ -149,9 +152,6 @@ export default function ProjectDetail() {
           <div className="bg-white rounded-lg shadow p-8">
             <NotesList projectId={id} />
           </div>
-
-          {/* Images */}
-          <ProjectImageGallery projectId={id} />
         </div>
 
         {/* Sidebar - Stats */}
