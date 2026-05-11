@@ -48,6 +48,22 @@ CREATE TABLE notes (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+-- Ideas table (submitted project ideas that can be converted into projects)
+CREATE TABLE ideas (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  brands TEXT[] NOT NULL DEFAULT '{}',
+  description TEXT NOT NULL,
+  use_case TEXT NOT NULL,
+  value_prop TEXT NOT NULL,
+  submitter_name TEXT NOT NULL,
+  submitter_email TEXT NOT NULL,
+  status TEXT DEFAULT 'new' CHECK (status IN ('new', 'under_review', 'approved', 'rejected', 'converted')),
+  converted_project_id UUID REFERENCES projects(id) ON DELETE SET NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
 -- 2. Create indexes for better query performance
 
 CREATE INDEX idx_projects_owner_id ON projects(owner_id);

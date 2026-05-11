@@ -395,3 +395,158 @@ export function useDeleteProjectImage() {
     },
   })
 }
+
+// ---------- Ideas ----------
+
+export function useIdeas() {
+  return useQuery({
+    queryKey: ['ideas'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ideas')
+        .select('*')
+        .order('created_at', { ascending: false })
+      if (error) throw new Error(error.message)
+      return data
+    },
+  })
+}
+
+export function useNewIdeaCount() {
+  return useQuery({
+    queryKey: ['ideas', 'newCount'],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from('ideas')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'new')
+      if (error) throw new Error(error.message)
+      return count || 0
+    },
+    refetchInterval: 60_000,
+  })
+}
+
+export function useCreateIdea() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (idea) => {
+      const { error } = await supabase
+        .from('ideas')
+        .insert([{
+          title: idea.title,
+          brands: idea.brands || [],
+          description: idea.description,
+          use_case: idea.useCase,
+          value_prop: idea.valueProp,
+          submitter_name: idea.submitterName,
+          submitter_email: idea.submitterEmail,
+        }])
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ideas'] })
+    },
+  })
+}
+
+export function useUpdateIdeaStatus() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, status }) => {
+      const { error } = await supabase
+        .from('ideas')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', id)
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ideas'] })
+    },
+  })
+}
+
+export function useDeleteIdea() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('ideas').delete().eq('id', id)
+      if (error) throw new Error(error.message)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ideas'] })
+    },
+  })
+}
+
+export function useConvertIdeaToProject() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ idea }) => {
+      // Get or create user from submitter info
+      let { data: user, error: userError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('email', idea.submitter_email)
+        .single()
+
+      if (userError) {
+        const { data: newUser, error: createError } = await supabase
+          .from('users')
+          .insert([{ name: idea.submitter_name, email: idea.submitter_email }])
+          .select('id')
+          .single()
+        if (createError) throw new Error(createError.message)
+        user = newUser
+      }
+
+      // Build a rich description from the idea fields
+      const brandLine = idea.brands && idea.brands.length
+        ? `<p><strong>Brands:</strong> ${idea.brands.join(', ')}</p>`
+        : ''
+      const description = [
+        brandLine,
+        `<h3>Description</h3><p>${escapeHtml(idea.description)}</p>`,
+        `<h3>Use case</h3><p>${escapeHtml(idea.use_case)}</p>`,
+        `<h3>Value prop</h3><p>${escapeHtml(idea.value_prop)}</p>`,
+      ].join('\n')
+
+      const { data: project, error: projectError } = await supabase
+        .from('projects')
+        .insert([{
+          title: idea.title,
+          description,
+          status: 'draft',
+          owner_id: user.id,
+        }])
+        .select('id')
+        .single()
+      if (projectError) throw new Error(projectError.message)
+
+      const { error: updateError } = await supabase
+        .from('ideas')
+        .update({
+          status: 'converted',
+          converted_project_id: project.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', idea.id)
+      if (updateError) throw new Error(updateError.message)
+
+      return project
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['ideas'] })
+      queryClient.invalidateQueries({ queryKey: ['projects'] })
+    },
+  })
+}
+
+function escapeHtml(str) {
+  if (!str) return ''
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>')
+}

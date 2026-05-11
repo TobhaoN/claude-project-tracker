@@ -7,6 +7,7 @@ import CreateProject from './pages/CreateProject'
 import EditProject from './pages/EditProject'
 import ProjectDetail from './pages/ProjectDetail'
 import Analytics from './pages/Analytics'
+import Ideas from './pages/Ideas'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/projects/new" element={<CreateProject />} />
               <Route path="/projects/:id" element={<ProjectDetail />} />
               <Route path="/projects/:id/edit" element={<EditProject />} />
+              <Route path="/ideas" element={<Ideas />} />
               <Route path="/analytics" element={<Analytics />} />
             </Routes>
           </div>

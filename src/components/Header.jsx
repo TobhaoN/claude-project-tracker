@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { exportProjectsToExcel } from '../lib/exportToExcel'
+import { useNewIdeaCount } from '../hooks/useData'
 
 export default function Header() {
   const [exporting, setExporting] = useState(false)
+  const { data: newIdeaCount = 0 } = useNewIdeaCount()
 
   const handleExport = async () => {
     setExporting(true)
@@ -29,6 +31,14 @@ export default function Header() {
           <nav className="space-x-4 flex items-center">
             <Link to="/" className="text-gray-600 hover:text-gray-900 font-medium">
               Projects
+            </Link>
+            <Link to="/ideas" className="relative text-gray-600 hover:text-gray-900 font-medium">
+              Ideas
+              {newIdeaCount > 0 && (
+                <span className="absolute -top-2 -right-4 bg-red-600 text-white text-xs font-bold rounded-full min-w-[1.25rem] h-5 px-1 flex items-center justify-center">
+                  {newIdeaCount}
+                </span>
+              )}
             </Link>
             <Link to="/analytics" className="text-gray-600 hover:text-gray-900 font-medium">
               Analytics
